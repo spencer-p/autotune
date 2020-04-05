@@ -13,17 +13,23 @@ fn makeSinBuf(comptime shift: f64, comptime amp: f64, comptime wlength: f64, com
     @setEvalBranchQuota(1000 * numwaves * @floatToInt(usize, wlength));
     defer @setEvalBranchQuota(1000);
 
-    var buf: [@floatToInt(usize, wlength)]u8 = undefined;
-    var i: usize = 0;
-    while (i < buf.len) : (i += 1) {
-        buf[i] = @floatToInt(u8, shift);
-    }
+    // Each index of the buffer will be the shift + the sum of all waves at
+    // that index.
 
+    // Start with the shift
+    var buf = [_]u8{@floatToInt(u8, shift)} ** @floatToInt(usize, wlength);
+
+    // Calculate for each wave:
     var wavei: usize = 1;
     while (wavei <= numwaves) : (wavei += 1) {
-        i = 0;
+
+        // At each index, add that part of the wave:
+        var i: usize = 0;
         while (i < buf.len) : (i += 1) {
             var sample = sinWave(amp, wlength / @intToFloat(f64, wavei), i);
+
+            // Calculate the absolute value of the wav and apply it in the
+            // correct direction, additive or subtractive
             if (sample < 0) {
                 buf[i] -= @floatToInt(u8, -sample);
             } else {
@@ -34,9 +40,6 @@ fn makeSinBuf(comptime shift: f64, comptime amp: f64, comptime wlength: f64, com
 
     return buf[0..];
 }
-
-const number_of_harmonics = 8;
-const sin_table = makeSinBuf(128, 16, 128, number_of_harmonics);
 
 pub fn fillBuf(f: fn (usize) u8, buf: []u8) void {
     var i: usize = 0;
@@ -50,5 +53,8 @@ pub fn randBytes(_: usize) u8 {
 }
 
 pub fn sineBytes(i: usize) u8 {
+    const number_of_harmonics = 8;
+    const sin_table = makeSinBuf(128, 16, 128, number_of_harmonics);
+
     return sin_table[i % sin_table.len];
 }
