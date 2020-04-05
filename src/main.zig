@@ -1,7 +1,7 @@
 const std = @import("std");
 const warn = std.debug.warn;
 usingnamespace @cImport(@cInclude("alsa/asoundlib.h"));
-usingnamespace @import("serialize.zig");
+usingnamespace @import("waves.zig");
 
 const SEC_IN_USEC = 1000000;
 
