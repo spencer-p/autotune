@@ -3,7 +3,7 @@ const warn = std.debug.warn;
 usingnamespace @cImport(@cInclude("alsa/asoundlib.h"));
 usingnamespace @import("serialize.zig");
 
-const SEC_TO_USEC = 1000000;
+const SEC_IN_USEC = 1000000;
 
 const device = "default";
 
@@ -38,7 +38,7 @@ pub fn main() !void {
         1, // number of channels
         48000, // 48 kHz?
         1, // allows resampling
-        SEC_TO_USEC / 2, // microseconds, "required overall latency"
+        SEC_IN_USEC / 2, // microseconds, "required overall latency"
     )) catch {
         warn("failed to set handle parameters\n", .{});
         return;
@@ -69,8 +69,6 @@ pub fn main() !void {
                 frames,
                 buf.len,
             });
-        } else {
-            warn("wrote bytes to output\n", .{});
         }
     }
 }
