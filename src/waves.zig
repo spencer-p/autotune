@@ -14,7 +14,8 @@ fn makeSinBuf(comptime shift: f64, comptime amp: f64, comptime wlength: f64, com
     defer @setEvalBranchQuota(1000);
 
     // Each index of the buffer will be the shift + the sum of all waves at
-    // that index.
+    // that index. The size of the buffer will be equal to the wavelength,
+    // s.t. the period will reset at the end of the buffer.
 
     // Start with the shift
     var buf = [_]u8{@floatToInt(u8, shift)} ** @floatToInt(usize, wlength);
