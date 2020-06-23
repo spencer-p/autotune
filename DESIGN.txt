@@ -1,0 +1,23 @@
+The goal is to have live audio captured, cleaned, and played back in near real
+time.
+
+Libasound provides us with a read/write buffered api for sound writing. That
+leaves us with performing a FFT and writing a new buffer in "real time". We can
+have three threads and a ring buffer of buffers. One thread reads buffers, one
+thread performs the fft, and one thread writes the result. We'll have to tune
+the fft to run fast enough to keep everything in sync. If it is too fast,
+perhaps we'll have to introduce blocking??
+
+The interface for the capture and playback threads will be fairly obvious; it
+matches roughly the API itself.
+
+From the fft thread: we want something that looks roughly like clean(out, in)
+that will preserve the parameters of the wave effectively with noise removed.
+The clean function should do something like:
+ 1. Determine the pitches being played and their amplitudes
+ 2. (optional: tune them to the fundamental)
+ 3. Determine the time offset for the peak
+ 4. Write out a new sample from the calculated wave
+
+The clean function should have the property that it converges. It should be the
+case that clean(clean(in)) == clean(in).
